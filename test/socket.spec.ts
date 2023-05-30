@@ -24,18 +24,19 @@ describe('Socket Testing', () => {
 
   it('should return what it sends', (done) => {
     clientSocket = Client(`http://localhost:${(httpServer.address() as AddressInfo).port}/channel01`)
-    // let message:string = 'mensagem-channel01'
-    clientSocket.on('teste', msg => {
-      expect(msg).toBe('connectou')
+    clientSocket.on('loadMessages', msg => {
+      expect(msg.messages).toEqual(['opa mensagem 1'])
       clientSocket.close()
       done()
     })
-    // clientSocket.emit('connect', message)
-    // clientSocket.on('resp_connect', (msg) => {
-    //   expect(msg).toBe(message)
-    //   clientSocket.close()
-    //   done()
-    // })
+  })
+  it('should return what it sends', (done) => {
+    clientSocket = Client(`http://localhost:${(httpServer.address() as AddressInfo).port}/channel01`)
+    clientSocket.on('sendMessage', msg => {
+      expect(msg.messages).toEqual(['opa mensagem 1'])
+      clientSocket.close()
+      done()
+    })
   })
 })
 
