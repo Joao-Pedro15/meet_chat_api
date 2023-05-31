@@ -1,5 +1,5 @@
 import { Avatar } from './avatar'
-export type Message = {
+export interface Message {
   id: string;
   userName: string;
   message: string;
