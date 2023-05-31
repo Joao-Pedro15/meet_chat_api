@@ -22,23 +22,30 @@ export function socketServer(httpServer: http.Server) {
     origin: '*',
   },
 })
-  const { channel01, channel02 } = getChannel(io)
-  channel01.on('connection', (socket) => {
-    console.log(socket.id);
+
+const { channel01, channel02 } = getChannel(io)
+  channel01.on('connection', (socket:Socket) => {
+    socket.emit('getHistoricMessages', messagesChannel01)
     socket.on('join-room', data => {
       socket.join(data)
     })
-    socket.emit('getHistoricMessages', messagesChannel01)
-    socket.on('teste', (data) => {
-      console.log(data, 'ee');      
-    } )
-    socket.on('sendMessageToServer', (data, type) => {
-      console.log('opa chegou!');
-      
+
+    socket.on('listUsersInRoom', async (data) => {
+      const room = data.room
+      const rooms = channel01.adapter.rooms
+      if(rooms.has(room)) {
+        const users = await channel01.in(room).fetchSockets()
+        return socket.emit('getUsersInRoom', users)
+      }
+      return socket.emit('getUsersInRoom', null)
+    })
+
+    socket.on('sendMessageToServer', (data, type) => {      
       messagesChannel01.push(data)
       channel01.emit('resendMessageToApp', data)
     })
   })
+
   channel02.on('connection', (socket) => {
     socket.emit('teste', 'connectou no dois')
   })
